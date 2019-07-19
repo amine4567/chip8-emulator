@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "Chip8.h"
+#include "Chip8.cpp"
+#include "tools.cpp"
 
 using namespace std;
 
@@ -9,7 +10,9 @@ Chip8 myChip8;
 int main()
 {
     // // Set up render system and register input callbacks
-    // myChip8.setupGraphics();
+    myChip8.setupGraphics(20);
+    sdl_loop();
+    
     // myChip8.setupInput();
 
     // // Initialize the Chip8 system and load the game into the memory
@@ -30,7 +33,9 @@ int main()
     //     myChip8.setKeys();
     // }
 
-    cout << "Hello world! Yes I did it !" << endl;
+    cout << "Hello world! Yes I did it !" << endl << "lalamdfkds" << endl;
 
+    myChip8.clearGraphics();
+    
     return 0;
 }

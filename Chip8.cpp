@@ -1,3 +1,5 @@
+#include <SDL2/SDL.h>
+
 #include "Chip8.h"
 
 using namespace std;
@@ -15,19 +17,30 @@ void Chip8::initialize()
     // Clear memory
 
     // Load fontset
-    for (int i = 0; i < 80; ++i)
-        memory[i] = chip8_fontset[i];
+    // for (int i = 0; i < 80; ++i)
+    //     memory[i] = chip8_fontset[i];
 
     // Reset timers
 }
 
-void Chip8::setupGraphics()
+void Chip8::setupGraphics(int screen_ratio = 10)
 {
-    // Fetch Opcode
-    // Decode Opcode
-    // Execute Opcode
+    SDL_Init(SDL_INIT_VIDEO);
 
-    // Update timers
+    SDL_Window *window = SDL_CreateWindow("Chip8 emulator", 
+                          SDL_WINDOWPOS_UNDEFINED, 
+                          SDL_WINDOWPOS_UNDEFINED, 
+                          SCREEN_W*screen_ratio, SCREEN_H*screen_ratio, 
+                          SDL_WINDOW_OPENGL);
+
+    if (window == NULL) {
+        cout << "Could not create windows:" << SDL_GetError() << endl; 
+    }
+}
+
+void Chip8::clearGraphics()
+{
+    SDL_Quit();
 }
 
 void Chip8::emulateCycle()
