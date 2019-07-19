@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 
 #include "Chip8.h"
+#include "tools.h"
 
 using namespace std;
 
@@ -27,15 +28,23 @@ void Chip8::setupGraphics(int screen_ratio = 10)
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window *window = SDL_CreateWindow("Chip8 emulator", 
-                          SDL_WINDOWPOS_UNDEFINED, 
-                          SDL_WINDOWPOS_UNDEFINED, 
-                          SCREEN_W*screen_ratio, SCREEN_H*screen_ratio, 
-                          SDL_WINDOW_OPENGL);
+    SDL_Window *window = SDL_CreateWindow("Chip8 emulator",
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SCREEN_W * screen_ratio,
+                                          SCREEN_H * screen_ratio,
+                                          SDL_WINDOW_OPENGL);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    if (window == NULL) {
-        cout << "Could not create windows:" << SDL_GetError() << endl; 
-    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 100, 255);
+
+    draw_scaled_pixel(renderer, 50, 20, screen_ratio);
+    draw_scaled_pixel(renderer, 30, 25, screen_ratio);
+    draw_scaled_pixel(renderer, 40, 6, screen_ratio);
+
+    SDL_RenderPresent(renderer);
 }
 
 void Chip8::clearGraphics()

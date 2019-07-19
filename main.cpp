@@ -12,7 +12,7 @@ int main()
     // // Set up render system and register input callbacks
     myChip8.setupGraphics(20);
     sdl_loop();
-    
+
     // myChip8.setupInput();
 
     // // Initialize the Chip8 system and load the game into the memory
@@ -33,9 +33,10 @@ int main()
     //     myChip8.setKeys();
     // }
 
-    cout << "Hello world! Yes I did it !" << endl << "lalamdfkds" << endl;
+    cout << "Hello world! Yes I did it !" << endl
+         << "lalamdfkds" << endl;
 
     myChip8.clearGraphics();
-    
+
     return 0;
 }
