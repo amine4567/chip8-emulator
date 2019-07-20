@@ -15,7 +15,7 @@ int main()
 
     // Initialize the Chip8 system and load the game into the memory
     myChip8.initialize();
-    myChip8.loadGame("PONG");
+    myChip8.loadGame("test_opcode.ch8");
 
     sdl_loop();
 
