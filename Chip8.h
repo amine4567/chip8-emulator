@@ -22,21 +22,20 @@ public:
     void draw_scaled_pixel(int, int);
     void draw_sprite(unsigned char *, unsigned char, unsigned char, unsigned char);
     void refreshRenderer();
+    void drawGraphics();
+    void setKeys();
 
+    bool drawFlag;
     std::map<int, unsigned char> keypadMap;
 
-private:
+    unsigned short pc; // program counter
+
     unsigned short opcode; // current opcode
 
     unsigned char memory[MEM_SIZE]; // RAM
-    unsigned short pc;              // program counter
 
     unsigned char V[REGISTERS_SIZE]; // registers
     unsigned short I;                // index register
-
-    unsigned char gfx[SCREEN_W * SCREEN_H]; // graphics: boolean pixels (monochromatic)
-    SDL_Renderer *renderer;
-    int screen_ratio;
 
     unsigned char delay_timer;
     unsigned char sound_timer;
@@ -45,4 +44,8 @@ private:
     unsigned short sp; // stack pointer
 
     unsigned char key[KEYPAD_INPUTS]; // keypad
+
+    unsigned char gfx[SCREEN_W * SCREEN_H]; // graphics: boolean pixels (monochromatic)
+    SDL_Renderer *renderer;
+    int screen_ratio;
 };

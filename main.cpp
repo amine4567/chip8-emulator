@@ -16,14 +16,9 @@ int main()
 
     // Initialize the Chip8 system and load the game into the memory
     myChip8.initialize();
-    myChip8.loadGame("test_opcode.ch8");
+    // cout << "program counter: " << myChip8.pc << endl;
 
-    // For testing only. To be removed later
-    myChip8.draw_scaled_pixel(50, 20);
-    myChip8.draw_scaled_pixel(30, 25);
-    myChip8.draw_scaled_pixel(40, 6);
-
-    myChip8.refreshRenderer();
+    myChip8.loadGame("TETRIS");
 
     int continuer = 1;
     SDL_Event event;
@@ -35,31 +30,27 @@ int main()
         case SDL_QUIT: /* Si c'est un événement de type "Quitter" */
             continuer = 0;
             break;
-        case SDL_KEYDOWN:
+        case SDL_KEYUP:
             int pressed_key = event.key.keysym.sym;
             if (myChip8.keypadMap.find(pressed_key) == myChip8.keypadMap.end())
             {
-                cout << "Unknown key pressed" << endl;
+                cout << "Unknown key pressed and released" << endl;
             }
             else
             {
-                cout << std::hex << "0x0" << +myChip8.keypadMap[pressed_key] << " key pressed down" << endl;
+                unsigned char chip8_key = myChip8.keypadMap.find(pressed_key)->second;
+                cout << std::hex << "0x0" << +chip8_key << " key pressed down" << endl;
+                myChip8.key[chip8_key] = 1;
             }
         }
-    }
 
-    // Emulation loop
-    while (0)
-    {
-        // Emulate one cycle
         myChip8.emulateCycle();
 
-        // // If the draw flag is set, update the screen
-        // if (myChip8.drawFlag)
-        //     myChip8.drawGraphics();
-
-        // // Store key press state (Press and Release)
-        // myChip8.setKeys();
+        // If the draw flag is set, update the screen
+        if (myChip8.drawFlag == 1)
+        {
+            myChip8.drawGraphics();
+        }
     }
 
     myChip8.clearGraphics();
