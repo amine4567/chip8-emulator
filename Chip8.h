@@ -1,3 +1,5 @@
+#include <map>
+
 #include <SDL2/SDL.h>
 
 const int MEM_SIZE = 4096;
@@ -19,6 +21,9 @@ public:
     void loadGame(std::string);
     void draw_scaled_pixel(int, int);
     void draw_sprite(unsigned char *, unsigned char, unsigned char, unsigned char);
+    void refreshRenderer();
+
+    std::map<int, unsigned char> keypadMap;
 
 private:
     unsigned short opcode; // current opcode

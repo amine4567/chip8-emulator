@@ -1,7 +1,7 @@
+#include <map>
 #include <SDL2/SDL.h>
 
 #include "Chip8.h"
-#include "tools.h"
 
 using namespace std;
 
@@ -40,7 +40,7 @@ void Chip8::initialize()
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // black background
     SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // content will be drawn in white
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // sprites will be drawn in white
 
     // Clear stack
     for (int i = 0; i <= STACK_SIZE - 1; i++)
@@ -81,16 +81,11 @@ void Chip8::setupGraphics(int scrn_ratio = 10)
                                           SCREEN_H * screen_ratio,
                                           SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+}
 
-    // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    // SDL_RenderClear(renderer);
-    // SDL_SetRenderDrawColor(renderer, 255, 0, 100, 255);
-
-    // draw_scaled_pixel(renderer, 50, 20, screen_ratio);
-    // draw_scaled_pixel(renderer, 30, 25, screen_ratio);
-    // draw_scaled_pixel(renderer, 40, 6, screen_ratio);
-
-    // SDL_RenderPresent(renderer);
+void Chip8::refreshRenderer()
+{
+    SDL_RenderPresent(renderer);
 }
 
 void Chip8::draw_scaled_pixel(int x, int y)
@@ -348,4 +343,34 @@ void Chip8::loadGame(std::string game_name)
     }
 
     cout << "bufferSize: " << bufferSize << endl;
+}
+
+void Chip8::setupInput()
+{
+    keypadMap.insert(pair<int, unsigned char>(SDLK_1, 0x01));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_2, 0x02));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_3, 0x03));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_4, 0x0C));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_a, 0x04));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_z, 0x05));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_e, 0x06));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_r, 0x0D));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_q, 0x07));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_s, 0x08));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_d, 0x09));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_f, 0x0E));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_w, 0x0A));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_x, 0x00));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_c, 0x0B));
+    keypadMap.insert(pair<int, unsigned char>(SDLK_v, 0x0F));
+
+    for (int i = 0; i <= KEYPAD_INPUTS - 1; i++)
+    {
+        key[i] = 0;
+    }
+
+    // for (std::map<int, unsigned char>::iterator it = keypadMap.begin(); it != keypadMap.end(); it++)
+    // {
+    //     cout << it->first << ":" << std::hex << "0x0" << +it->second << endl;
+    // }
 }
