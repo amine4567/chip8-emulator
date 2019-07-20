@@ -17,6 +17,8 @@ public:
     void clearGraphics();
     void setupInput();
     void loadGame(std::string);
+    void draw_scaled_pixel(int, int);
+    void draw_sprite(unsigned char *, unsigned char, unsigned char, unsigned char);
 
 private:
     unsigned short opcode; // current opcode
@@ -29,6 +31,7 @@ private:
 
     unsigned char gfx[SCREEN_W * SCREEN_H]; // graphics: boolean pixels (monochromatic)
     SDL_Renderer *renderer;
+    int screen_ratio;
 
     unsigned char delay_timer;
     unsigned char sound_timer;

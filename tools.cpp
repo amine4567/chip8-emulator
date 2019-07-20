@@ -26,3 +26,7 @@ void draw_scaled_pixel(SDL_Renderer *renderer, int x, int y, int screen_ratio)
             SDL_RenderDrawPoint(renderer, xi, yi);
         }
 }
+
+void draw_sprite(unsigned char *sprite, unsigned char x, unsigned char y, unsigned char n)
+{
+}

@@ -69,8 +69,9 @@ void Chip8::initialize()
     sound_timer = 0;
 }
 
-void Chip8::setupGraphics(int screen_ratio = 10)
+void Chip8::setupGraphics(int scrn_ratio = 10)
 {
+    screen_ratio = scrn_ratio;
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow("Chip8 emulator",
@@ -92,6 +93,34 @@ void Chip8::setupGraphics(int screen_ratio = 10)
     // SDL_RenderPresent(renderer);
 }
 
+void Chip8::draw_scaled_pixel(int x, int y)
+{
+    for (int xi = x * screen_ratio; xi <= x * screen_ratio + screen_ratio - 1; xi++)
+        for (int yi = y * screen_ratio; yi <= y * screen_ratio + screen_ratio - 1; yi++)
+        {
+            SDL_RenderDrawPoint(renderer, xi, yi);
+        }
+}
+
+void Chip8::draw_sprite(unsigned char *sprite, unsigned char x0, unsigned char y0, unsigned char n)
+{
+    unsigned char current_x = x0, current_y = y0;
+
+    for (int i = 0; i <= n; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            bool bit = sprite[i] & (1 << j);
+            if (bit == 1)
+            {
+                draw_scaled_pixel(current_x, current_y);
+            }
+            current_x++;
+        }
+        current_y++;
+    }
+}
+
 void Chip8::clearGraphics()
 {
     SDL_Quit();
@@ -105,7 +134,17 @@ void Chip8::emulateCycle()
     // Decode opcode
     switch (opcode & 0xF000)
     {
-        // Some opcodes //
+    case 0x0000:
+        switch (opcode & 0x0FFF)
+        {
+        case 0x00E0: //00E0 - CLS. Clear the display.
+            //TODO
+            break;
+        case 0x00EE: // 00EE - RET. Return from a subroutine.
+            //TODO
+            break;
+        }
+        break;
     case 0x1000: //1nnn - JP addr. Jump to location nnn.
         pc = opcode & 0x0FFF;
         break;
@@ -143,44 +182,47 @@ void Chip8::emulateCycle()
     case 0x8000:
         switch (opcode & 0x000F)
         {
-        case (0x0000): //8xy0 - LD Vx, Vy. Set Vx = Vy.
+        case 0x0000: //8xy0 - LD Vx, Vy. Set Vx = Vy.
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x00F0 >> 4];
             pc += 2;
             break;
-        case (0x0001): //8xy1 - OR Vx, Vy. Set Vx = Vx OR Vy.
+        case 0x0001: //8xy1 - OR Vx, Vy. Set Vx = Vx OR Vy.
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x0F00 >> 8] | V[opcode & 0x00F0 >> 4];
             pc += 2;
             break;
-        case (0x0002): //8xy2 - AND Vx, Vy. Set Vx = Vx AND Vy.
+        case 0x0002: //8xy2 - AND Vx, Vy. Set Vx = Vx AND Vy.
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x0F00 >> 8] & V[opcode & 0x00F0 >> 4];
             pc += 2;
             break;
-        case (0x0003): //8xy3 - XOR Vx, Vy. Set Vx = Vx XOR Vy.
+        case 0x0003: //8xy3 - XOR Vx, Vy. Set Vx = Vx XOR Vy.
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x0F00 >> 8] ^ V[opcode & 0x00F0 >> 4];
             pc += 2;
             break;
-        case (0x0004): //8xy4 - ADD Vx, Vy. Set Vx = Vx + Vy, set VF = carry.
-            unsigned short sum = V[opcode & 0x0F00 >> 8] + V[opcode & 0x00F0 >> 4];
-            (sum > 255) ? V[0xF] = 1 : V[0xF] = 0;
-            V[opcode & 0x0F00 >> 8] = sum & 0x00FF;
-            pc += 2;
+        case 0x0004:
+            //8xy4 - ADD Vx, Vy. Set Vx = Vx + Vy, set VF = carry.
+            {
+                unsigned short sum = V[opcode & 0x0F00 >> 8] + V[opcode & 0x00F0 >> 4];
+                (sum > 255) ? V[0xF] = 1 : V[0xF] = 0;
+                V[opcode & 0x0F00 >> 8] = sum & 0x00FF;
+                pc += 2;
+            }
             break;
-        case (0x0005): //8xy5 - SUB Vx, Vy. Set Vx = Vx - Vy, set VF = NOT borrow.
+        case 0x0005: //8xy5 - SUB Vx, Vy. Set Vx = Vx - Vy, set VF = NOT borrow.
             (V[opcode & 0x0F00 >> 8] > V[opcode & 0x00F0 >> 4]) ? V[0xF] = 1 : V[0xF] = 0;
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x0F00 >> 8] - V[opcode & 0x00F0 >> 4];
             pc += 2;
             break;
-        case (0x0006): //8xy6 - SHR Vx {, Vy}. Set Vx = Vx SHR 1.
+        case 0x0006: //8xy6 - SHR Vx {, Vy}. Set Vx = Vx SHR 1.
             (V[opcode & 0x0F00 >> 8] & 0x01 == 0x01) ? V[0xF] = 1 : V[0xF] = 0;
             V[opcode & 0x0F00 >> 8] /= 2;
             pc += 2;
             break;
-        case (0x0007): //8xy7 - SUBN Vx, Vy. Set Vx = Vy - Vx, set VF = NOT borrow.
+        case 0x0007: //8xy7 - SUBN Vx, Vy. Set Vx = Vy - Vx, set VF = NOT borrow.
             (V[opcode & 0x00F0 >> 4] > V[opcode & 0x0F00 >> 8]) ? V[0xF] = 1 : V[0xF] = 0;
             V[opcode & 0x0F00 >> 8] = V[opcode & 0x00F0 >> 4] - V[opcode & 0x0F00 >> 8];
             pc += 2;
             break;
-        case (0x000E): //SHL Vx {, Vy}. Set Vx = Vx SHL 1.
+        case 0x000E: //SHL Vx {, Vy}. Set Vx = Vx SHL 1.
             (V[opcode & 0x0F00 >> 8] & 0x80 == 0x80) ? V[0xF] = 1 : V[0xF] = 0;
             V[opcode & 0x0F00 >> 8] *= 2;
             pc += 2;
@@ -200,20 +242,74 @@ void Chip8::emulateCycle()
     case 0xB000: //Bnnn - JP V0, addr. Jump to location nnn + V0.
         pc = opcode & 0x0FFF + V[0x0];
         break;
-    case 0xC000: //Cxkk - RND Vx, byte. Set Vx = random byte AND kk.
-        unsigned char rnd = (unsigned char)rand();
-        V[opcode & 0x0F00 >> 8] = rnd & (opcode & 0x00FF);
+    case 0xC000:
+        //Cxkk - RND Vx, byte. Set Vx = random byte AND kk.
+        {
+            unsigned char rnd = (unsigned char)rand();
+            V[opcode & 0x0F00 >> 8] = rnd & (opcode & 0x00FF);
+        }
         break;
     case 0xD000: //Dxyn - DRW Vx, Vy, nibble.
         //Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
-        unsigned char n = opcode & 0x000F;
-        unsigned char sprites[n];
-
-        for (int j = 0; j <= n - 1; j++)
         {
-            sprites[j] = memory[I + j];
+            unsigned char n = opcode & 0x000F;
+            unsigned char sprites[n];
+
+            for (int j = 0; j <= n - 1; j++)
+            {
+                sprites[j] = memory[I + j];
+            }
+            // WIP
         }
-        // WIP
+        break;
+    case 0xE000:
+        switch (opcode & 0x00FF)
+        {
+        case 0x009E: //Ex9E - SKP Vx.
+            //Skip next instruction if key with the value of Vx is pressed.
+            //TODO
+            break;
+        case 0x00A1: //ExA1 - SKNP Vx.
+            //Skip next instruction if key with the value of Vx is not pressed.
+            //TODO
+            break;
+        }
+        break;
+    case 0xF000:
+        switch (opcode & 0x00FF)
+        {
+        case 0x0007: //Fx07 - LD Vx, DT. Set Vx = delay timer value.
+            //TODO
+            break;
+        case 0x000A: //Fx0A - LD Vx, K.
+            //Wait for a key press, store the value of the key in Vx.
+            //TODO
+            break;
+        case 0x0015: //Fx15 - LD DT, Vx. Set delay timer = Vx.
+            //TODO
+            break;
+        case 0x0018: //Fx18 - LD ST, Vx. Set sound timer = Vx.
+            //TODO
+            break;
+        case 0x001E: //Fx1E - ADD I, Vx. Set I = I + Vx.
+            //TODO
+            break;
+        case 0x0029: // Fx29 - LD F, Vx. Set I = location of sprite for digit Vx.
+            //TODO
+            break;
+        case 0x0033: //Fx33 - LD B, Vx.
+            //Store BCD representation of Vx in memory locations I, I + 1, and I + 2.
+            //TODO
+            break;
+        case 0x0055: //Fx55 - LD [I], Vx.
+            //Store registers V0 through Vx in memory starting at location I.
+            //TODO
+            break;
+        case 0x0065: //Fx65 - LD Vx, [I].
+            //ead registers V0 through Vx from memory starting at location I.
+            //TODO
+            break;
+        }
         break;
     default:
         printf("Unknown opcode: 0x%X\n", opcode);
