@@ -26,7 +26,7 @@ public:
     void setKeys();
 
     bool drawFlag;
-    std::map<int, unsigned char> keypadMap;
+    std::map<Uint8, unsigned char> keypadMap;
 
     unsigned short pc; // program counter
 

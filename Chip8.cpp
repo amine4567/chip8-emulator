@@ -34,9 +34,7 @@ void Chip8::initialize()
 
     // Clear display
     for (int i = 0; i <= SCREEN_W * SCREEN_H - 1; i++)
-    {
         gfx[i] = 0;
-    }
 
     drawFlag = 0;
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // black background
@@ -45,21 +43,19 @@ void Chip8::initialize()
 
     // Clear stack
     for (int i = 0; i <= STACK_SIZE - 1; i++)
-    {
         stack[i] = 0;
-    }
 
     // Clear registers V0-VF
     for (int i = 0; i <= REGISTERS_SIZE - 1; i++)
-    {
         V[i] = 0;
-    }
 
     // Clear memory
     for (int i = 0; i <= MEM_SIZE - 1; i++)
-    {
         memory[i] = 0x00;
-    }
+
+    // Clear keypad
+    for (int i = 0; i <= KEYPAD_INPUTS - 1; i++)
+        key[i] = 0;
 
     // Load fontset
     for (int j = 0; j < 80; j++)
@@ -126,7 +122,6 @@ void Chip8::emulateCycle()
 {
     // Fetch opcode
     opcode = memory[pc] << 8 | memory[pc + 1];
-    printf("Fetched opcode: 0x%X\n", opcode);
 
     // Decode opcode
     switch (opcode & 0xF000)
@@ -434,22 +429,22 @@ void Chip8::loadGame(std::string game_name)
 
 void Chip8::setupInput()
 {
-    keypadMap.insert(pair<int, unsigned char>(SDLK_1, 0x01));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_2, 0x02));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_3, 0x03));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_4, 0x0C));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_a, 0x04));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_z, 0x05));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_e, 0x06));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_r, 0x0D));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_q, 0x07));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_s, 0x08));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_d, 0x09));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_f, 0x0E));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_w, 0x0A));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_x, 0x00));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_c, 0x0B));
-    keypadMap.insert(pair<int, unsigned char>(SDLK_v, 0x0F));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_1, 0x01));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_2, 0x02));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_3, 0x03));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_4, 0x0C));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_Q, 0x04));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_W, 0x05));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_E, 0x06));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_R, 0x0D));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_A, 0x07));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_S, 0x08));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_D, 0x09));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_F, 0x0E));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_Z, 0x0A));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_X, 0x00));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_C, 0x0B));
+    keypadMap.insert(pair<Uint8, unsigned char>(SDL_SCANCODE_V, 0x0F));
 
     for (int i = 0; i <= KEYPAD_INPUTS - 1; i++)
     {
@@ -459,19 +454,18 @@ void Chip8::setupInput()
 
 void Chip8::drawGraphics()
 {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // black background
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
     for (int x = 0; x < SCREEN_W; x++)
         for (int y = 0; y < SCREEN_H; y++)
         {
             char px_val = gfx[y * SCREEN_W + x];
             if (px_val == 1)
             {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                draw_scaled_pixel(x, y);
             }
-            else
-            {
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-            }
-            draw_scaled_pixel(x, y);
         }
 
     SDL_RenderPresent(renderer);

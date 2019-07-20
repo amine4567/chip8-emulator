@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <map>
 
 #include <SDL2/SDL.h>
 
@@ -10,13 +13,14 @@ Chip8 myChip8;
 
 int main()
 {
-    // // Set up render system and register input callbacks
+    const Uint8 *keyboard_state;
+
+    // Set up render system and register input callbacks
     myChip8.setupGraphics(50);
     myChip8.setupInput();
 
     // Initialize the Chip8 system and load the game into the memory
     myChip8.initialize();
-    // cout << "program counter: " << myChip8.pc << endl;
 
     myChip8.loadGame("TETRIS");
 
@@ -24,33 +28,40 @@ int main()
     SDL_Event event;
     while (continuer)
     {
-        SDL_PollEvent(&event); /* Récupération de l'événement dans event */
-        switch (event.type)    /* Test du type d'événement */
+        myChip8.emulateCycle();
+
+        while (SDL_PollEvent(&event))
         {
-        case SDL_QUIT: /* Si c'est un événement de type "Quitter" */
-            continuer = 0;
-            break;
-        case SDL_KEYUP:
-            int pressed_key = event.key.keysym.sym;
-            if (myChip8.keypadMap.find(pressed_key) == myChip8.keypadMap.end())
+            switch (event.type)
             {
-                cout << "Unknown key pressed and released" << endl;
-            }
-            else
-            {
-                unsigned char chip8_key = myChip8.keypadMap.find(pressed_key)->second;
-                cout << std::hex << "0x0" << +chip8_key << " key pressed down" << endl;
-                myChip8.key[chip8_key] = 1;
+            case SDL_QUIT:
+                continuer = 0;
+                break;
             }
         }
 
-        myChip8.emulateCycle();
+        keyboard_state = SDL_GetKeyboardState(NULL);
+        for (std::map<Uint8, unsigned char>::iterator it = myChip8.keypadMap.begin(); it != myChip8.keypadMap.end(); it++)
+        {
+            if (keyboard_state[it->first])
+            {
+                cout << it->first << " is pressed" << endl;
+                myChip8.key[it->second] = 1;
+            }
+            else
+            {
+                myChip8.key[it->second] = 0;
+            }
+        }
 
         // If the draw flag is set, update the screen
         if (myChip8.drawFlag == 1)
         {
             myChip8.drawGraphics();
         }
+
+        // Sleep to slow down emulation speed
+        std::this_thread::sleep_for(std::chrono::microseconds(2000));
     }
 
     myChip8.clearGraphics();
