@@ -11,30 +11,29 @@ int main()
 {
     // // Set up render system and register input callbacks
     myChip8.setupGraphics(20);
-    sdl_loop();
+    // sdl_loop();
 
     // myChip8.setupInput();
 
-    // // Initialize the Chip8 system and load the game into the memory
-    // myChip8.initialize();
-    // myChip8.loadGame("pong");
+    // Initialize the Chip8 system and load the game into the memory
+    myChip8.initialize();
+    myChip8.loadGame("PONG");
 
-    // // Emulation loop
-    // for (;;)
-    // {
-    //     // Emulate one cycle
-    //     myChip8.emulateCycle();
+    sdl_loop();
 
-    //     // If the draw flag is set, update the screen
-    //     if (myChip8.drawFlag)
-    //         drawGraphics();
+    // Emulation loop
+    for (;;)
+    {
+        // Emulate one cycle
+        myChip8.emulateCycle();
 
-    //     // Store key press state (Press and Release)
-    //     myChip8.setKeys();
-    // }
+        // // If the draw flag is set, update the screen
+        // if (myChip8.drawFlag)
+        //     drawGraphics();
 
-    cout << "Hello world! Yes I did it !" << endl
-         << "lalamdfkds" << endl;
+        // // Store key press state (Press and Release)
+        // myChip8.setKeys();
+    }
 
     myChip8.clearGraphics();
 
