@@ -22,13 +22,13 @@ private:
     unsigned short opcode; // current opcode
 
     unsigned char memory[MEM_SIZE]; // RAM
+    unsigned short pc;              // program counter
 
     unsigned char V[REGISTERS_SIZE]; // registers
-
-    unsigned short I;  // index register
-    unsigned short pc; // program counter
+    unsigned short I;                // index register
 
     unsigned char gfx[SCREEN_W * SCREEN_H]; // graphics: boolean pixels (monochromatic)
+    SDL_Renderer *renderer;
 
     unsigned char delay_timer;
     unsigned char sound_timer;
@@ -37,6 +37,4 @@ private:
     unsigned short sp; // stack pointer
 
     unsigned char key[KEYPAD_INPUTS]; // keypad
-
-    SDL_Renderer *renderer;
 };

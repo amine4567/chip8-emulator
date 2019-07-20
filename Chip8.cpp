@@ -106,14 +106,24 @@ void Chip8::emulateCycle()
     switch (opcode & 0xF000)
     {
         // Some opcodes //
-
+    case 0x1000: //1NNN - JP addr. Jump to location NNN.
+        pc = opcode & 0x0FFF;
+        break;
+    case 0x2000: //2NNN - CALL addr. Call subroutine at NNN.
+        stack[sp] = pc;
+        sp++;
+        pc = opcode & 0x0FFF;
+        break;
+    case 0x3000: //3XKK - SE VX, byte. Skip next instruction if VX = KK.
+        if (V[opcode & 0x0F00] == opcode & 0x00FF)
+        {
+            pc += 2;
+        }
+        break;
     case 0xA000: // ANNN: Sets I to the address NNN
-        // Execute opcode
         I = opcode & 0x0FFF;
         pc += 2;
         break;
-
-        // More opcodes //
 
     default:
         printf("Unknown opcode: 0x%X\n", opcode);
