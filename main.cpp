@@ -15,16 +15,17 @@ int main()
 {
     const Uint8 *keyboard_state;
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    SDL_Init(SDL_INIT_VIDEO);
 
-    // Set up render system and register input callbacks
+    // Set up render system, audio and register input callbacks
     myChip8.setupGraphics(50);
+    myChip8.setupAudio();
     myChip8.setupInput();
 
     // Initialize the Chip8 system and load the game into the memory
     myChip8.initialize();
 
-    myChip8.loadGame("UFO");
+    myChip8.loadGame("BRIX");
 
     int continuer = 1;
     SDL_Event event;

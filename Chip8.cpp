@@ -1,5 +1,6 @@
 #include <map>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "Chip8.h"
 
@@ -96,43 +97,16 @@ void audioCallBack(void *userdata, Uint8 *stream, int len)
     audio_len -= len;
 }
 
-void Chip8::playAudio()
+void Chip8::setupAudio()
 {
-    /* Load the WAV */
-    // the specs, length and buffer of our wav are filled
-    if (SDL_LoadWAV("beep.wav", &wav_spec, &wav_buffer, &wav_length) == NULL)
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0)
     {
-        cout << "Error loading wav file" << endl;
+        cout << "Error initializing SDL_Mixer" << endl;
     }
+    // Amount of channels (Max amount of sounds playing at the same time)
+    Mix_AllocateChannels(32);
 
-    // Définition des propriétés audio
-    wav_spec.freq = 44100;
-    wav_spec.format = AUDIO_S16;
-    wav_spec.channels = 1; //mono
-    wav_spec.samples = 1024;
-    wav_spec.callback = audioCallBack;
-    wav_spec.userdata = NULL;
-
-    // set our global static variables
-    audio_pos = wav_buffer; // copy sound buffer
-    audio_len = wav_length; // copy file length
-
-    /* Open the audio device */
-    if (SDL_OpenAudio(&wav_spec, NULL) < 0)
-    {
-        fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-        exit(-1);
-    }
-
-    // Lancement de la lecture
-    SDL_PauseAudio(0);
-
-    // Attendre que la lecture du son soit terminée
-    while (audio_len > 0)
-        SDL_Delay(50);
-
-    // Fermeture du module
-    SDL_CloseAudio();
+    beep_wav = Mix_LoadWAV("beep.wav");
 }
 
 void Chip8::refreshRenderer()
@@ -456,8 +430,7 @@ void Chip8::emulateCycle()
         if (sound_timer == 1)
         {
             printf("BEEP!\n");
-
-            playAudio();
+            Mix_PlayChannel(-1, beep_wav, 0);
         }
         --sound_timer;
     }

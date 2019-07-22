@@ -16,7 +16,7 @@ public:
     void initialize();
     void emulateCycle();
     void setupGraphics(int);
-    void playAudio();
+    void setupAudio();
     void clearGraphics();
     void setupInput();
     void loadGame(std::string);
@@ -50,7 +50,5 @@ public:
     SDL_Renderer *renderer;
     int screen_ratio;
 
-    Uint32 wav_length;
-    Uint8 *wav_buffer;
-    SDL_AudioSpec wav_spec;
+    Mix_Chunk *beep_wav;
 };
