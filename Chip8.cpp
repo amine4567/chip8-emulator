@@ -96,7 +96,7 @@ void audioCallBack(void *userdata, Uint8 *stream, int len)
     audio_len -= len;
 }
 
-void Chip8::setupAudio()
+void Chip8::playAudio()
 {
     /* Load the WAV */
     // the specs, length and buffer of our wav are filled
@@ -457,7 +457,7 @@ void Chip8::emulateCycle()
         {
             printf("BEEP!\n");
 
-            setupAudio();
+            playAudio();
         }
         --sound_timer;
     }

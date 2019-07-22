@@ -16,7 +16,7 @@ public:
     void initialize();
     void emulateCycle();
     void setupGraphics(int);
-    void setupAudio();
+    void playAudio();
     void clearGraphics();
     void setupInput();
     void loadGame(std::string);
