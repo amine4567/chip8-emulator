@@ -15,6 +15,8 @@ int main()
 {
     const Uint8 *keyboard_state;
 
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
     // Set up render system and register input callbacks
     myChip8.setupGraphics(50);
     myChip8.setupInput();
@@ -61,7 +63,7 @@ int main()
         }
 
         // Sleep to slow down emulation speed
-        std::this_thread::sleep_for(std::chrono::microseconds(2000));
+        std::this_thread::sleep_for(std::chrono::microseconds(1200));
     }
 
     myChip8.clearGraphics();

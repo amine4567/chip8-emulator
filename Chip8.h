@@ -16,6 +16,7 @@ public:
     void initialize();
     void emulateCycle();
     void setupGraphics(int);
+    int setupAudio();
     void clearGraphics();
     void setupInput();
     void loadGame(std::string);
@@ -48,4 +49,6 @@ public:
     unsigned char gfx[SCREEN_W * SCREEN_H]; // graphics: boolean pixels (monochromatic)
     SDL_Renderer *renderer;
     int screen_ratio;
+
+    SDL_AudioSpec audioSortie;
 };

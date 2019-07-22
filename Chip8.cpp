@@ -69,7 +69,6 @@ void Chip8::initialize()
 void Chip8::setupGraphics(int scrn_ratio = 10)
 {
     screen_ratio = scrn_ratio;
-    SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow("Chip8 emulator",
                                           SDL_WINDOWPOS_UNDEFINED,
@@ -78,6 +77,26 @@ void Chip8::setupGraphics(int scrn_ratio = 10)
                                           SCREEN_H * screen_ratio,
                                           SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+}
+
+int Chip8::setupAudio()
+{
+    // Définition des propriétés audio
+    audioSortie.freq = 22050;
+    audioSortie.format = AUDIO_S16;
+    audioSortie.channels = 2;
+    audioSortie.samples = 1024;
+    audioSortie.callback = audioCallback;
+    audioSortie.userdata = NULL;
+
+    // Initialisation de la couche audio
+    if (SDL_OpenAudio(&audioSortie, NULL) < 0)
+    {
+        fprintf(stderr, "Erreur d'ouverture audio: %s\n", SDL_GetError());
+        return (-1);
+    }
+
+    return 0;
 }
 
 void Chip8::refreshRenderer()
@@ -470,8 +489,4 @@ void Chip8::drawGraphics()
 
     SDL_RenderPresent(renderer);
     drawFlag = 0;
-}
-
-void setKeys()
-{
 }
