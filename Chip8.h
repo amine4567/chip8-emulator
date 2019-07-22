@@ -16,7 +16,7 @@ public:
     void initialize();
     void emulateCycle();
     void setupGraphics(int);
-    int setupAudio();
+    void setupAudio();
     void clearGraphics();
     void setupInput();
     void loadGame(std::string);
@@ -50,5 +50,7 @@ public:
     SDL_Renderer *renderer;
     int screen_ratio;
 
-    SDL_AudioSpec audioSortie;
+    Uint32 wav_length;
+    Uint8 *wav_buffer;
+    SDL_AudioSpec wav_spec;
 };

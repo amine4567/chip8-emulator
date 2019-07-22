@@ -20,11 +20,12 @@ int main()
     // Set up render system and register input callbacks
     myChip8.setupGraphics(50);
     myChip8.setupInput();
+    myChip8.setupAudio();
 
     // Initialize the Chip8 system and load the game into the memory
     myChip8.initialize();
 
-    myChip8.loadGame("TETRIS");
+    myChip8.loadGame("UFO");
 
     int continuer = 1;
     SDL_Event event;

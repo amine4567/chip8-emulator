@@ -79,24 +79,60 @@ void Chip8::setupGraphics(int scrn_ratio = 10)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
-int Chip8::setupAudio()
-{
-    // Définition des propriétés audio
-    audioSortie.freq = 22050;
-    audioSortie.format = AUDIO_S16;
-    audioSortie.channels = 2;
-    audioSortie.samples = 1024;
-    audioSortie.callback = audioCallback;
-    audioSortie.userdata = NULL;
+Uint8 *audio_pos;
+Uint32 audio_len;
 
-    // Initialisation de la couche audio
-    if (SDL_OpenAudio(&audioSortie, NULL) < 0)
+void audioCallBack(void *userdata, Uint8 *stream, int len)
+{
+
+    if (audio_len == 0)
+        return;
+
+    len = (len > audio_len ? audio_len : len);
+    //SDL_memcpy (stream, audio_pos, len); 					// simply copy from one buffer into the other
+    SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME); // mix from one buffer into another
+
+    audio_pos += len;
+    audio_len -= len;
+}
+
+void Chip8::setupAudio()
+{
+    /* Load the WAV */
+    // the specs, length and buffer of our wav are filled
+    if (SDL_LoadWAV("beep.wav", &wav_spec, &wav_buffer, &wav_length) == NULL)
     {
-        fprintf(stderr, "Erreur d'ouverture audio: %s\n", SDL_GetError());
-        return (-1);
+        cout << "Error loading wav file" << endl;
     }
 
-    return 0;
+    // Définition des propriétés audio
+    wav_spec.freq = 44100;
+    wav_spec.format = AUDIO_S16;
+    wav_spec.channels = 1; //mono
+    wav_spec.samples = 1024;
+    wav_spec.callback = audioCallBack;
+    wav_spec.userdata = NULL;
+
+    // set our global static variables
+    audio_pos = wav_buffer; // copy sound buffer
+    audio_len = wav_length; // copy file length
+
+    /* Open the audio device */
+    if (SDL_OpenAudio(&wav_spec, NULL) < 0)
+    {
+        fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+        exit(-1);
+    }
+
+    // Lancement de la lecture
+    SDL_PauseAudio(0);
+
+    // Attendre que la lecture du son soit terminée
+    while (audio_len > 0)
+        SDL_Delay(50);
+
+    // Fermeture du module
+    SDL_CloseAudio();
 }
 
 void Chip8::refreshRenderer()
@@ -418,7 +454,11 @@ void Chip8::emulateCycle()
     if (sound_timer > 0)
     {
         if (sound_timer == 1)
+        {
             printf("BEEP!\n");
+
+            setupAudio();
+        }
         --sound_timer;
     }
 }
